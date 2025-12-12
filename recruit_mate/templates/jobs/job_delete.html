@@ -1,0 +1,68 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Delete Job - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .delete-card {
+        background: white;
+        border-radius: 8px;
+        padding: 40px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        max-width: 600px;
+        text-align: center;
+    }
+    
+    .warning-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+    
+    .delete-card h2 {
+        font-size: 24px;
+        font-weight: bold;
+        color: #991b1b;
+        margin-bottom: 15px;
+    }
+    
+    .delete-card p {
+        color: #6b7280;
+        margin-bottom: 25px;
+        line-height: 1.6;
+    }
+    
+    .job-info {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        text-align: left;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="page-header">
+    <h1 class="page-title">Delete Job Description</h1>
+</div>
+
+<div class="delete-card">
+    <div class="warning-icon">⚠️</div>
+    <h2>Are you sure?</h2>
+    <p>This action cannot be undone. This will permanently delete the job description and all associated interviews.</p>
+    
+    <div class="job-info">
+        <strong>Job Title:</strong> {{ job.title }}<br>
+        <strong>Location:</strong> {{ job.location|default:"Remote" }}<br>
+        <strong>Created:</strong> {{ job.created_at|date:"M d, Y" }}
+    </div>
+    
+    <form method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete Job</button>
+        <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

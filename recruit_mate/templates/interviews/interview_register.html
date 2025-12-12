@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+
+{% block title %}Register for Interview - {{ session.job.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+        padding: 40px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .register-container {
+        max-width: 600px;
+        width: 100%;
+    }
+    
+    .register-card {
+        background: white;
+        border-radius: 16px;
+        padding: 50px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .register-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .register-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+    
+    .register-header h1 {
+        font-size: 28px;
+        font-weight: bold;
+        color: #111827;
+        margin-bottom: 10px;
+    }
+    
+    .register-header p {
+        font-size: 16px;
+        color: #6b7280;
+    }
+    
+    .job-info {
+        background: #f9fafb;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .job-info h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+    
+    .job-info p {
+        font-size: 14px;
+        color: #6b7280;
+        margin: 0;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+    
+    .form-group label .required {
+        color: #ef4444;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .form-hint {
+        font-size: 13px;
+        color: #9ca3af;
+        margin-top: 6px;
+    }
+    
+    .submit-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        padding: 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+    
+    .privacy-note {
+        text-align: center;
+        font-size: 13px;
+        color: #9ca3af;
+        margin-top: 20px;
+    }
+    
+    .file-input-wrapper {
+        position: relative;
+        border: 2px dashed #d1d5db;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .file-input-wrapper:hover {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+    
+    .file-input-wrapper.has-file {
+        border-color: #10b981;
+        background: #ecfdf5;
+    }
+    
+    .file-input-icon {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+    
+    .file-input-text {
+        font-size: 14px;
+        color: #374151;
+        font-weight: 500;
+    }
+    
+    .file-input-hint {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 5px;
+    }
+    
+    .file-name-display {
+        margin-top: 10px;
+        padding: 8px 12px;
+        background: white;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #059669;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-page">
+    <div class="register-container">
+        <div class="register-card">
+            <div class="register-header">
+                <div class="register-icon">👋</div>
+                <h1>Welcome to Your Interview</h1>
+                <p>Please provide your details to get started</p>
+            </div>
+            
+            <div class="job-info">
+                <h2>{{ session.job.title }}</h2>
+                <p>{{ session.job.location }}</p>
+            </div>
+            
+            {% if error %}
+            <div style="background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <strong>⚠️ Error:</strong> {{ error }}
+            </div>
+            {% endif %}
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="candidate_name">
+                        Full Name <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="candidate_name" 
+                        name="candidate_name" 
+                        class="form-input" 
+                        placeholder="John Doe"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="candidate_email">
+                        Email Address <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        id="candidate_email" 
+                        name="candidate_email" 
+                        class="form-input" 
+                        placeholder="john@example.com"
+                        required
+                    >
+                    <div class="form-hint">We'll use this to send you your interview results</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="candidate_phone">
+                        Phone Number
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="candidate_phone" 
+                        name="candidate_phone" 
+                        class="form-input" 
+                        placeholder="+99-9999999999"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="candidate_resume_file">
+                        Upload Resume <span class="required">*</span>
+                    </label>
+                    <label for="candidate_resume_file" class="file-input-wrapper" id="fileInputWrapper">
+                        <div class="file-input-icon">📄</div>
+                        <div class="file-input-text">Click to upload your resume</div>
+                        <div class="file-input-hint">PDF, DOC, or DOCX format (Max 10MB)</div>
+                        <div class="file-name-display" id="fileNameDisplay" style="display: none;"></div>
+                        <input 
+                            type="file" 
+                            id="candidate_resume_file" 
+                            name="candidate_resume_file" 
+                            accept=".pdf,.doc,.docx"
+                            required
+                            style="display: none;"
+                        >
+                    </label>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Start Interview →
+                </button>
+                
+                <div class="privacy-note">
+                    🔒 Your information is secure and will only be shared with the hiring team
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('candidate_resume_file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const wrapper = document.getElementById('fileInputWrapper');
+    const display = document.getElementById('fileNameDisplay');
+    
+    if (file) {
+        // Check file size (10MB limit)
+        const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+        if (file.size > maxSize) {
+            alert('File size must be less than 10MB. Please choose a smaller file.');
+            e.target.value = '';
+            return;
+        }
+        
+        // Update UI
+        wrapper.classList.add('has-file');
+        wrapper.querySelector('.file-input-icon').textContent = '✅';
+        wrapper.querySelector('.file-input-text').textContent = 'Resume uploaded successfully!';
+        display.textContent = file.name;
+        display.style.display = 'block';
+    } else {
+        // Reset UI
+        wrapper.classList.remove('has-file');
+        wrapper.querySelector('.file-input-icon').textContent = '📄';
+        wrapper.querySelector('.file-input-text').textContent = 'Click to upload your resume';
+        display.style.display = 'none';
+    }
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const fileInput = document.getElementById('candidate_resume_file');
+    if (!fileInput.files || fileInput.files.length === 0) {
+        e.preventDefault();
+        alert('Please upload your resume to continue.');
+        fileInput.focus();
+    }
+});
+</script>
+{% endblock %}

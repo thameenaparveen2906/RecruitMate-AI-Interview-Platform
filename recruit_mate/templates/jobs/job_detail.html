@@ -1,0 +1,135 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{{ job.title }} - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .detail-card {
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .detail-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #111827;
+        margin-bottom: 10px;
+    }
+    
+    .detail-meta {
+        display: flex;
+        gap: 20px;
+        color: #6b7280;
+        font-size: 14px;
+    }
+    
+    .detail-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .section {
+        margin-bottom: 30px;
+    }
+    
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 15px;
+    }
+    
+    .section-content {
+        color: #374151;
+        line-height: 1.8;
+    }
+    
+    .skills-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .skill-badge {
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        color: #1e40af;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        border: 1px solid #93c5fd;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="detail-card">
+    <div class="detail-header">
+        <div>
+            <h1 class="detail-title">{{ job.title }}</h1>
+            <div class="detail-meta">
+                <span>📍 {{ job.location|default:"Remote" }}</span>
+                <span>💼 {{ job.employment_type|title }}</span>
+                <span>📅 Created {{ job.created_at|date:"M d, Y" }}</span>
+                <span>
+                    {% if job.is_active %}
+                    <span style="color: #10b981;">● Active</span>
+                    {% else %}
+                    <span style="color: #6b7280;">● Inactive</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="detail-actions">
+            <a href="{% url 'jobs:edit' job.pk %}" class="btn btn-primary">Edit</a>
+            <a href="{% url 'jobs:delete' job.pk %}" class="btn btn-danger">Delete</a>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Description</h2>
+        <div class="section-content">{{ job.description|linebreaks }}</div>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Requirements</h2>
+        <div class="section-content">{{ job.requirements|linebreaks }}</div>
+    </div>
+    
+    {% if job.skills %}
+    <div class="section">
+        <h2 class="section-title">Required Skills (AI Extracted)</h2>
+        <div class="skills-grid">
+            {% for skill in job.skills %}
+            <span class="skill-badge">{{ skill }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="detail-card">
+    <h2 class="section-title">Quick Actions</h2>
+    <div style="display: flex; gap: 15px; margin-top: 20px;">
+        <a href="{% url 'interviews:create' %}?job={{ job.pk }}" class="btn btn-primary">
+            Create Interview for this Job
+        </a>
+        <a href="{% url 'jobs:lists' %}" class="btn btn-secondary">
+            Back to Jobs
+        </a>
+    </div>
+</div>
+{% endblock %}

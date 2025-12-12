@@ -1,0 +1,369 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{{ candidate.name }} - Candidate Profile{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #3b82f6;
+        text-decoration: none;
+        font-size: 14px;
+        margin-bottom: 20px;
+        transition: all 0.2s;
+    }
+    
+    .back-link:hover {
+        color: #2563eb;
+        transform: translateX(-4px);
+    }
+    
+    .profile-header {
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .profile-top {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 40px;
+        font-weight: bold;
+    }
+    
+    .profile-info h1 {
+        font-size: 32px;
+        font-weight: bold;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+    
+    .profile-contact {
+        display: flex;
+        gap: 20px;
+        font-size: 16px;
+        color: #6b7280;
+    }
+    
+    .resume-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #3b82f6;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .resume-link:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+    }
+    
+    .download-btn {
+        background: #10b981;
+    }
+    
+    .download-btn:hover {
+        background: #059669;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+    
+    .stat-card {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+    }
+    
+    .stat-label {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .stat-value {
+        font-size: 32px;
+        font-weight: bold;
+        color: #111827;
+    }
+    
+    .stat-value.green {
+        color: #10b981;
+    }
+    
+    .stat-value.blue {
+        color: #3b82f6;
+    }
+    
+    .stat-value.gray {
+        color: #6b7280;
+    }
+    
+    .section-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #111827;
+        margin-bottom: 20px;
+    }
+    
+    .interview-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: all 0.2s;
+    }
+    
+    .interview-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .interview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+    
+    .interview-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+    
+    .interview-date {
+        font-size: 14px;
+        color: #6b7280;
+    }
+    
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-in-progress {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .status-abandoned {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .interview-scores {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .score-item {
+        text-align: center;
+        padding: 15px;
+        background: #f9fafb;
+        border-radius: 8px;
+    }
+    
+    .score-label {
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 5px;
+    }
+    
+    .score-value {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    
+    .score-overall {
+        color: #111827;
+    }
+    
+    .score-technical {
+        color: #3b82f6;
+    }
+    
+    .score-behavioral {
+        color: #8b5cf6;
+    }
+    
+    .interview-note {
+        background: #fef3c7;
+        border: 1px solid #fbbf24;
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 14px;
+        color: #92400e;
+        margin-bottom: 15px;
+    }
+    
+    .view-report-btn {
+        padding: 10px 24px;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+    
+    .view-report-btn:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<a href="{% url 'candidates:all' %}" class="back-link">
+    ← Back to Candidates
+</a>
+
+<div class="profile-header">
+    <div class="profile-top">
+        <div class="profile-avatar">{{ candidate.name.0|upper }}</div>
+        <div class="profile-info">
+            <h1>{{ candidate.name }}</h1>
+            <div class="profile-contact">
+                <span>📧 {{ candidate.email }}</span>
+                {% if candidate.phone %}
+                <span>📞 {{ candidate.phone }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% if candidate.resume_file %}
+        <div style="margin-left: auto;">
+            <a href="{{ candidate.resume_file.url }}" target="_blank" class="resume-link">
+                📄 View Resume
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Interviews</div>
+            <div class="stat-value">{{ stats.total_interviews }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Completed</div>
+            <div class="stat-value green">{{ stats.completed_interviews }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">In Progress</div>
+            <div class="stat-value blue">{{ stats.in_progress_interviews }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Average Score</div>
+            <div class="stat-value {% if stats.average_score %}{% if stats.average_score >= 70 %}green{% elif stats.average_score >= 50 %}blue{% else %}gray{% endif %}{% else %}gray{% endif %}">
+                {% if stats.average_score %}{{ stats.average_score }}{% else %}-{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="section-title">Interview History</h2>
+
+{% if interviews %}
+    {% for interview in interviews %}
+    <div class="interview-card">
+        <div class="interview-header">
+            <div>
+                <div class="interview-title">{{ interview.job.title }}</div>
+                <div class="interview-date">
+                    {{ interview.started_at|date:"F d, Y" }} at {{ interview.started_at|time:"h:i A" }}
+                </div>
+            </div>
+            <div>
+                {% if interview.status == 'completed' %}
+                <span class="status-badge status-completed">✅ Completed</span>
+                {% elif interview.status == 'in_progress' %}
+                <span class="status-badge status-in-progress">🔄 In Progress</span>
+                {% else %}
+                <span class="status-badge status-abandoned">⚠️ Abandoned</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if interview.status == 'completed' and interview.result %}
+        <div class="interview-scores">
+            <div class="score-item">
+                <div class="score-label">Overall Score</div>
+                <div class="score-value score-overall">{{ interview.result.overall_score }}<span style="font-size: 16px; color: #6b7280;">/100</span></div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Technical</div>
+                <div class="score-value score-technical">{{ interview.technical_score|default:"-" }}<span style="font-size: 16px; color: #6b7280;">/100</span></div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Behavioral</div>
+                <div class="score-value score-behavioral">{{ interview.behavioral_score|default:"-" }}<span style="font-size: 16px; color: #6b7280;">/100</span></div>
+            </div>
+        </div>
+        
+        <a href="{% url 'candidates:interview_report' interview.pk %}" class="view-report-btn">
+            View Full Report
+        </a>
+        {% elif interview.status == 'in_progress' %}
+        <div class="interview-note">
+            ⏳ Interview in progress - {{ interview.answers.count }}/{{ interview.questions.count }} questions answered
+        </div>
+        {% else %}
+        <div class="interview-note">
+            ⚠️ Interview incomplete - consider rescheduling
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+{% else %}
+<div class="interview-card" style="text-align: center; padding: 60px;">
+    <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
+    <h3 style="font-size: 18px; color: #111827; margin-bottom: 8px;">No Interview History</h3>
+    <p style="color: #6b7280;">This candidate hasn't completed any interviews yet</p>
+</div>
+{% endif %}
+{% endblock %}

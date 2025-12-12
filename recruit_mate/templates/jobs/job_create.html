@@ -1,0 +1,94 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Create Job - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .form-card {
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        max-width: 800px;
+    }
+    
+    .form-header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .form-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #111827;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e5e7eb;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="page-header">
+    <h1 class="page-title">Create Job Description</h1>
+</div>
+
+<div class="form-card">
+    <div class="form-header">
+        <h2 class="form-title">Job Details</h2>
+        <p style="color: #6b7280; margin-top: 8px;">AI will automatically extract skills from your description</p>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="title">Job Title *</label>
+            <input type="text" id="title" name="title" class="form-control" 
+                   placeholder="e.g. Senior Python Developer" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Job Description *</label>
+            <textarea id="description" name="description" class="form-control" 
+                      placeholder="Describe the role, responsibilities, and what you're looking for..." 
+                      required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="requirements">Requirements *</label>
+            <textarea id="requirements" name="requirements" class="form-control" 
+                      placeholder="List the required skills, experience, and qualifications..." 
+                      required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="location">Location</label>
+            <input type="text" id="location" name="location" class="form-control" 
+                   placeholder="e.g. Remote, New York, Hybrid">
+        </div>
+        
+        <div class="form-group">
+            <label for="employment_type">Employment Type</label>
+            <select id="employment_type" name="employment_type" class="form-control">
+                <option value="full-time">Full-time</option>
+                <option value="part-time">Part-time</option>
+                <option value="contract">Contract</option>
+                <option value="internship">Internship</option>
+            </select>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Job Description</button>
+            <a href="{% url 'jobs:lists' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

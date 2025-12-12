@@ -1,0 +1,210 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Interviews - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .filter-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .filter-tab {
+        padding: 12px 24px;
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .filter-tab:hover {
+        color: #111827;
+    }
+    
+    .filter-tab.active {
+        color: #3b82f6;
+        border-bottom-color: #3b82f6;
+    }
+    
+    .interview-card {
+        background: white;
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 15px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+    }
+    
+    .interview-card:hover {
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .interview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 15px;
+    }
+    
+    .interview-info {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .candidate-avatar {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+    }
+    
+    .interview-details h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 5px;
+    }
+    
+    .interview-details p {
+        font-size: 14px;
+        color: #6b7280;
+    }
+    
+    .interview-meta {
+        display: flex;
+        gap: 20px;
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .copy-link-btn {
+        background: #f3f4f6;
+        color: #374151;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        border: 1px solid #d1d5db;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .copy-link-btn:hover {
+        background: #e5e7eb;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="page-actions">
+    <h1 class="page-title">Interview Sessions</h1>
+    <a href="{% url 'interviews:create' %}" class="btn btn-primary">+ Create Interview</a>
+</div>
+
+<div class="filter-tabs">
+    <button class="filter-tab active" data-filter="all">All</button>
+    <button class="filter-tab" data-filter="pending">Pending</button>
+    <button class="filter-tab" data-filter="in_progress">In Progress</button>
+    <button class="filter-tab" data-filter="completed">Completed</button>
+</div>
+
+{% if sessions %}
+    {% for session in sessions %}
+    <div class="interview-card" data-status="{{ session.status }}">
+        <div class="interview-header">
+            <div class="interview-info">
+                <div class="candidate-avatar">
+                    {{ session.candidate.name.0|upper }}
+                </div>
+                <div class="interview-details">
+                    <h3>{{ session.candidate.name }}</h3>
+                    <p>{{ session.job.title }}</p>
+                </div>
+            </div>
+            <div>
+                {% if session.status == 'completed' %}
+                <span class="status-badge status-completed">✅ Completed</span>
+                {% elif session.status == 'in_progress' %}
+                <span class="status-badge status-in-progress">🔄 In Progress</span>
+                {% elif session.status == 'pending' %}
+                <span style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                    ⏳ Pending
+                </span>
+                {% else %}
+                <span class="status-badge status-abandoned">⚠️ Abandoned</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="interview-meta">
+            <span>Created: {{ session.created_at|date:"M d, Y" }}</span>
+            {% if session.started_at %}
+            <span>Started: {{ session.started_at|date:"M d, Y H:i" }}</span>
+            {% endif %}
+            {% if session.completed_at %}
+            <span>Completed: {{ session.completed_at|date:"M d, Y H:i" }}</span>
+            {% endif %}
+            {% if session.result %}
+            <span>Score: {{ session.result.overall_score }}/100</span>
+            {% endif %}
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <a href="{% url 'interviews:detail' session.pk %}" class="btn btn-primary btn-sm">View Details</a>
+            {% if session.status == 'completed' %}
+            <a href="{% url 'interviews:results' session.pk %}" class="btn btn-secondary btn-sm">View Results</a>
+            {% endif %}
+            <button class="copy-link-btn" onclick="copyLink('{{ request.scheme }}://{{ request.get_host }}{% url 'interviews:take' session.token %}')">
+                Copy Link
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+<div class="empty-state">
+    <h3>No Interviews Yet</h3>
+    <p>Create your first interview to start evaluating candidates</p>
+    <a href="{% url 'interviews:create' %}" class="btn btn-primary">Create Interview</a>
+</div>
+{% endif %}
+
+<script>
+function copyLink(url) {
+    navigator.clipboard.writeText(url).then(() => {
+        alert('Interview link copied to clipboard!');
+    });
+}
+
+// Filter functionality
+document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        const filter = this.dataset.filter;
+        document.querySelectorAll('.interview-card').forEach(card => {
+            if (filter === 'all' || card.dataset.status === filter) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

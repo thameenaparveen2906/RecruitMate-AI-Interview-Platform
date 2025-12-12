@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block title %}Interview - {{ session.job.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .interview-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+        padding: 40px 20px;
+    }
+    
+    .interview-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .interview-header {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .company-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .company-logo {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
+    
+    .company-details h1 {
+        font-size: 24px;
+        font-weight: bold;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+    
+    .company-details p {
+        color: #6b7280;
+    }
+    
+    .progress-bar-container {
+        background: #e5e7eb;
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+    
+    .progress-bar {
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        height: 100%;
+        transition: width 0.3s;
+    }
+    
+    .progress-text {
+        text-align: center;
+        color: #6b7280;
+        font-size: 14px;
+    }
+    
+    .question-card {
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .question-number {
+        font-size: 14px;
+        font-weight: 600;
+        color: #6b7280;
+    }
+    
+    .question-type {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .type-badge {
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .type-technical {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .type-behavioral {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .difficulty-easy {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .difficulty-medium {
+        background: #fed7aa;
+        color: #9a3412;
+    }
+    
+    .difficulty-hard {
+        background: #fecaca;
+        color: #991b1b;
+    }
+    
+    .question-text {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+    
+    .answer-section {
+        margin-bottom: 30px;
+    }
+    
+    .answer-section label {
+        display: block;
+        font-size: 16px;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 12px;
+    }
+    
+    .answer-textarea {
+        width: 100%;
+        min-height: 200px;
+        padding: 15px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 16px;
+        font-family: inherit;
+        resize: vertical;
+        transition: border-color 0.3s;
+    }
+    
+    .answer-textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .answer-hint {
+        font-size: 14px;
+        color: #6b7280;
+        margin-top: 8px;
+    }
+    
+    .submit-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .submit-btn {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        padding: 15px 40px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    
+    .submit-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .completion-card {
+        background: white;
+        border-radius: 12px;
+        padding: 60px 40px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .completion-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+    }
+    
+    .completion-card h2 {
+        font-size: 32px;
+        font-weight: bold;
+        color: #111827;
+        margin-bottom: 15px;
+    }
+    
+    .completion-card p {
+        font-size: 18px;
+        color: #6b7280;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="interview-page">
+    <div class="interview-container">
+        <div class="interview-header">
+            <div class="company-info">
+                <div class="company-details">
+                    <h1>{{ session.job.title }}</h1>
+                    <p>Interview for {% if session.candidate %}{{ session.candidate.name }}{% elif session.candidate_name %}{{ session.candidate_name }}{% else %}Candidate{% endif %}</p>
+                </div>
+            </div>
+            
+            <div class="progress-bar-container">
+                {% if progress.total > 0 %}
+                {% widthratio progress.answered progress.total 100 as progress_percent %}
+                <div class="progress-bar" style="width: {{ progress_percent }}%"></div>
+                {% endif %}
+            </div>
+            <div class="progress-text">
+                Question {{ progress.answered }} of {{ progress.total }}
+            </div>
+        </div>
+        
+        {% if question %}
+        <div class="question-card">
+            <div class="question-header">
+                <div class="question-number">
+                    Question {{ progress.answered|add:"1" }} of {{ progress.total }}
+                    {% if question.is_mandatory %}
+                    <span style="color: #ef4444; font-size: 12px; margin-left: 8px;">⭐ MANDATORY</span>
+                    {% endif %}
+                </div>
+                <div class="question-type">
+                    <span class="type-badge type-{{ question.question_type }}">
+                        {{ question.question_type|title }}
+                    </span>
+                    <span class="type-badge difficulty-{{ question.difficulty }}">
+                        {{ question.difficulty|title }}
+                    </span>
+                    {% if question.is_custom %}
+                    <span class="type-badge" style="background: #8b5cf6; color: white;">
+                        Custom
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if question.is_mandatory %}
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
+                <span style="color: #991b1b; font-size: 14px; font-weight: 500;">
+                    ⚠️ This is a mandatory question set by the recruiter. Please provide a thorough answer.
+                </span>
+            </div>
+            {% endif %}
+            
+            <div class="question-text">
+                {{ question.question_text }}
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="answer-section">
+                    <label for="answer">Your Answer</label>
+                    <textarea 
+                        id="answer" 
+                        name="answer" 
+                        class="answer-textarea" 
+                        placeholder="Type your answer here..."
+                        required
+                    ></textarea>
+                    <div class="answer-hint">
+                        💡 Take your time and provide a detailed answer. The AI will evaluate your response.
+                    </div>
+                </div>
+                
+                <div class="submit-section">
+                    <div style="color: #6b7280;">
+                        ⏱️ No time limit - answer at your own pace
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        Submit Answer →
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% else %}
+        <div class="completion-card">
+            <div class="completion-icon">🎉</div>
+            <h2>Interview Completed!</h2>
+            <p>Thank you for completing the interview. Your responses have been submitted and are being evaluated.</p>
+            <p style="font-size: 16px; color: #6b7280;">
+                The recruiter will review your results and get back to you soon.
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

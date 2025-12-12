@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+
+{% block title %}RecruitMate - Home{% endblock %}
+
+{% block extra_css %}
+<style>
+    .home-container {
+        font-family: "Poppins", sans-serif;
+        color: black;
+        line-height: 1.6;
+        background: white;
+    }
+
+    .brand-text {
+        font-size: 25px;
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .navbar {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 16px 25px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+        
+    .navbar-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .nav-buttons {
+        display: flex;
+        gap: 15px;
+    }
+
+    .nav-button {
+        font-size: 0.9 rem;
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+    }
+
+
+    .navbar-logo {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .btn-secondary:hover {
+        color:#4bb3fd;
+        opacity: 75%;
+    }
+
+    .btn-outline {
+        border: 2px solid #6c5ce7;
+        color: #6c5ce7;
+    }
+
+    .btn-outline:hover {
+        background: #6c5ce7;
+        color: #fff;
+    }
+
+    .hero {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 100px 50px;
+        border-radius: 0 0 50% 50% / 0 0 15% 15%;
+        background: linear-gradient(120deg, #ffffff, #e6f7ff);
+        overflow: hidden;
+    }
+
+    .hero-background-shape{ 
+        position: absolute; 
+        width: 500px; 
+        height: 500px; 
+        background: #6c5ce7;   
+        opacity: 50%; 
+        border-radius: 50%; 
+        top: 10px;
+        right: -65px; 
+        z-index: 0; 
+        background-position: top;
+    }
+
+    .hero-text {
+        max-width: 600px;
+        z-index: 1;
+    }
+
+    .hero-text h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .hero-text p {
+        font-size: 1.2rem;
+        margin-bottom: 25px;
+        color: #555;
+    }
+
+    .hero-btn {
+        font-size: 1.1rem;
+        padding: 14px 28px;
+        border-radius: 10px;
+    }
+
+    .hero-image {
+        font-size: 6rem;
+        z-index: 1;
+    }
+
+    .features, .how-it-works {
+        text-align: center;
+        padding: 60px 50px;
+    }
+
+    .features h2, .how-it-works h2 {
+        font-size: 2.5rem;
+        margin-bottom: 50px;
+    }
+
+    .features-cards, .steps {
+        display: flex;
+        justify-content: center;
+        gap: 50px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .features-cards p{
+       padding-top: 20px;
+    }
+
+    .card{
+        background: #fff;
+        padding: 30px 25px;
+        border-radius: 25px;
+        box-shadow:
+            0 10px 25px rgba(208, 204, 237, 0.6), 
+            0 4px 15px rgba(208, 204, 237, 0.45);
+        transition: transform 0.4s, box-shadow 0.4s;
+        width: 300px;
+        height: 300px;
+    }
+
+    .step-card {
+        background: #fff;
+        padding: 30px 25px;
+        border-radius: 200%;
+        box-shadow:
+            0 10px 25px rgba(208, 204, 237, 0.6), 
+            0 4px 15px rgba(208, 204, 237, 0.45);
+        transition: transform 0.4s, box-shadow 0.4s;
+        width: 250px;
+        margin-bottom: 100px;
+    }
+
+    .card:hover, .step-card:hover {
+        transform: translateY(-10px);
+        box-shadow:
+            0 20px 40px rgba(208, 204, 237, 0.8),
+            0 8px 25px rgba(208, 204, 237, 0.6);
+    }
+
+    .card-gif {
+        width: 70px;
+        height: 70px;
+        object-fit: contain;
+        margin-bottom: 10px;
+    }
+
+    .step-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color:  #4bb3fd;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(10px);
+    }
+
+    .footer {
+        background: linear-gradient(120deg, #6c5ce7,#4bb3fd );
+        color: white;
+        padding: 20px 40px;
+        text-align: center;
+        border-radius: 60px 60px 0 0;
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="home-container">
+
+   
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="navbar-logo brand-text">RecruitMate</div>
+            <div class="nav-buttons">
+                <a href="{% url 'accounts:login' %}" class="nav-button btn-secondary">Login</a>
+                <a href="{% url 'accounts:signup' %}" class="nav-button btn-primary">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+   
+    <section class="hero">
+        <div class="hero-background-shape" style="background-image: url('/static/image.png');"></div>
+
+        <div class="hero-text">
+            <h1>AI-Powered Hiring, Simplified</h1>
+            <p>
+                Automate candidate evaluation and streamline your hiring process with
+                intelligent AI-driven interviews.
+            </p>
+
+            <a href="{% url 'accounts:signup' %}" class="btn-primary hero-btn">
+                Get Started Free
+            </a>
+        </div>
+    </section>
+
+    
+    <section class="features">
+        <h2>Why RecruitMate?</h2>
+
+        <div class="features-cards">
+
+            <div class="card glass-card">
+                <img src="/static/link.gif" class="card-gif" alt="Link GIF">
+                <h3>Shareable Interview Links</h3>
+                <p>
+                    Send interview links instantly to candidates for different roles.
+            </div>
+
+            <div class="card glass-card">
+                <img src="/static/ai.gif" class="card-gif" alt="AI GIF">
+                <h3>AI-Powered Evaluation</h3>
+                <p>
+                    Get instant insights and feedback on candidate performance.
+                </p>
+            </div>
+
+            <div class="card glass-card">
+                <img src="/static/dashboard.gif" class="card-gif" alt="Dashboard GIF">
+                <h3>Comprehensive Dashboard</h3>
+                <p>
+                    Manage all interviews and track results in one place.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+
+    <section class="how-it-works">
+        <h2>How It Works?</h2>
+
+        <div class="steps">
+
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h4>Create Job</h4>
+                <p>Define job requirements and interview criteria.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h4>Share Link</h4>
+                <p>Send interview link to candidates.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h4>AI Interview</h4>
+                <p>Candidates complete the interview.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h4>Review Results</h4>
+                <p>AI generates scores and insights.</p>
+            </div>
+
+        </div>
+    </section>
+
+    
+    <footer class="footer">
+        <p>© 2025 RecruitMate. All rights reserved.</p>
+    </footer>
+
+</div>
+{% endblock %}

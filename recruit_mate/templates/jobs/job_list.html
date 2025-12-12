@@ -1,0 +1,173 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Job Descriptions - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .page-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    
+    .job-grid {
+        display: grid;
+        gap: 20px;
+    }
+    
+    .job-card {
+        background: white;
+        border-radius: 8px;
+        padding: 25px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+    }
+    
+    .job-card:hover {
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .job-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 15px;
+    }
+    
+    .job-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+    
+    .job-meta {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 15px;
+    }
+    
+    .job-meta span {
+        margin-right: 15px;
+    }
+    
+    .job-description {
+        color: #374151;
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+    
+    .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .skill-tag {
+        background: #dbeafe;
+        color: #1e40af;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .job-actions {
+        display: flex;
+        gap: 10px;
+        padding-top: 15px;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 8px;
+    }
+    
+    .empty-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        font-size: 20px;
+        color: #111827;
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        color: #6b7280;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="page-actions">
+    <h1 class="page-title">Job Descriptions</h1>
+    <a href="{% url 'jobs:create' %}" class="btn btn-primary">+ Create Job</a>
+</div>
+
+{% if jobs %}
+<div class="job-grid">
+    {% for job in jobs %}
+    <div class="job-card">
+        <div class="job-header">
+            <div>
+                <h2 class="job-title">{{ job.title }}</h2>
+                <div class="job-meta">
+                    <span>📍 {{ job.location|default:"Remote" }}</span>
+                    <span>💼 {{ job.employment_type|title }}</span>
+                    <span>📆 {{ job.created_at|date:"M d, Y" }}</span>
+                </div>
+            </div>
+            <div>
+                {% if job.is_active %}
+                <span style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                    Active
+                </span>
+                {% else %}
+                <span style="background: #f3f4f6; color: #6b7280; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                    Inactive
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="job-description">
+            {{ job.description|truncatewords:30 }}
+        </div>
+        
+        {% if job.skills %}
+        <div class="skills-container">
+            {% for skill in job.skills|slice:":5" %}
+            <span class="skill-tag">{{ skill }}</span>
+            {% endfor %}
+            {% if job.skills|length > 5 %}
+            <span class="skill-tag">+{{ job.skills|length|add:"-5" }} more</span>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <div class="job-actions">
+            <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-primary">View Details</a>
+            <a href="{% url 'jobs:edit' job.pk %}" class="btn btn-secondary">Edit</a>
+            <a href="{% url 'jobs:delete' job.pk %}" class="btn btn-danger">Delete</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">📝</div>
+    <h3>No Job Descriptions Yet</h3>
+    <p>Create your first job description to start interviewing candidates</p>
+    <a href="{% url 'jobs:create' %}" class="btn btn-primary">Create Job Description</a>
+</div>
+{% endif %}
+{% endblock %}

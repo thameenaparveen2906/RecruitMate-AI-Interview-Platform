@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Interview Expired{% endblock %}
+
+{% block extra_css %}
+<style>
+    .message-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    
+    .message-card {
+        background: white;
+        border-radius: 16px;
+        padding: 60px 40px;
+        text-align: center;
+        max-width: 500px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .message-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+    }
+    
+    .message-card h1 {
+        font-size: 28px;
+        font-weight: bold;
+        color: #991b1b;
+        margin-bottom: 15px;
+    }
+    
+    .message-card p {
+        font-size: 16px;
+        color: #6b7280;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="message-page">
+    <div class="message-card">
+        <div class="message-icon">⏰</div>
+        <h1>Interview Link Expired</h1>
+        <p>This interview link has expired and is no longer valid.</p>
+        <p style="margin-top: 15px;">Please contact the recruiter for a new interview link.</p>
+    </div>
+</div>
+{% endblock %}

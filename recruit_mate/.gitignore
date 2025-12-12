@@ -1,0 +1,23 @@
+# Django
+*.pyc
+__pycache__/
+db.sqlite3
+
+# Environment
+.env
+venv/
+env/
+*.env
+
+# IDE
+.vscode/
+.idea/
+
+# Static
+staticfiles/
+
+# OS
+.DS_Store
+
+# Credentials safety
+settings_local.py

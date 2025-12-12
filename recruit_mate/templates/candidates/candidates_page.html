@@ -1,0 +1,419 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Candidates - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .candidates-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    
+    .candidates-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #111827;
+    }
+    
+    .candidates-count {
+        font-size: 16px;
+        color: #6b7280;
+        margin-top: 5px;
+    }
+    
+    .search-box {
+        position: relative;
+        width: 400px;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 12px 45px 12px 45px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+    
+    .candidates-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .table-header {
+        display: grid;
+        grid-template-columns: 50px 2fr 2fr 1.5fr 1.5fr 1.5fr 1.5fr;
+        padding: 20px 25px;
+        background: #f9fafb;
+        border-bottom: 2px solid #e5e7eb;
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .sortable-header {
+        cursor: pointer;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: color 0.2s;
+    }
+    
+    .sortable-header:hover {
+        color: #3b82f6;
+    }
+    
+    .sort-icon {
+        font-size: 10px;
+        opacity: 0.5;
+    }
+    
+    .sort-icon.active {
+        opacity: 1;
+        color: #3b82f6;
+    }
+    
+    .table-row {
+        display: grid;
+        grid-template-columns: 50px 2fr 2fr 1.5fr 1.5fr 1.5fr 1.5fr;
+        padding: 20px 25px;
+        border-bottom: 1px solid #e5e7eb;
+        align-items: center;
+        transition: background 0.2s;
+    }
+    
+    .table-row:hover {
+        background: #f9fafb;
+    }
+    
+    .candidate-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 16px;
+    }
+    
+    .candidate-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .candidate-name {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+    
+    .candidate-phone {
+        font-size: 13px;
+        color: #6b7280;
+    }
+    
+    .candidate-email {
+        font-size: 13px;
+        color: #6b7280;
+    }
+    
+    .interview-count {
+        font-size: 14px;
+        color: #374151;
+    }
+    
+    .interview-count-detail {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 2px;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-in-progress {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .status-abandoned {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .score-display {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+    }
+    
+    .view-btn {
+        padding: 8px 16px;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+    
+    .view-btn:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+    }
+    
+    .empty-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+    
+    .empty-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 10px;
+    }
+    
+    .empty-text {
+        font-size: 16px;
+        color: #6b7280;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="candidates-header">
+    <div>
+        <h1 class="candidates-title">Candidates</h1>
+        <p class="candidates-count">{{ candidates|length }} unique candidate{{ candidates|length|pluralize }}</p>
+    </div>
+
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input 
+                type="text"
+                class="search-input"
+                placeholder="Search by name, email, or status..."
+                id="searchInput"
+                onkeyup="filterCandidates()"
+            >
+        </div>
+
+        <a href="{% url 'candidates:create' %}" class="btn btn-primary">
+            + Add Candidate
+        </a>
+    </div>
+</div>
+
+
+{% if candidates %}
+<div class="candidates-table">
+    <div class="table-header">
+        <div></div>
+        <div class="sortable-header" onclick="sortTable('name')">
+            CANDIDATE
+            <span class="sort-icon" id="sort-icon-name">↕</span>
+        </div>
+        <div class="sortable-header" onclick="sortTable('email')">
+            EMAIL
+            <span class="sort-icon" id="sort-icon-email">↕</span>
+        </div>
+        <div class="sortable-header" onclick="sortTable('interviews')">
+            INTERVIEWS
+            <span class="sort-icon" id="sort-icon-interviews">↕</span>
+        </div>
+        <div class="sortable-header" onclick="sortTable('status')">
+            LATEST STATUS
+            <span class="sort-icon" id="sort-icon-status">↕</span>
+        </div>
+        <div class="sortable-header" onclick="sortTable('score')">
+            BEST SCORE
+            <span class="sort-icon" id="sort-icon-score">↕</span>
+        </div>
+        <div>ACTIONS</div>
+    </div>
+    
+    {% for candidate in candidates %}
+    <div class="table-row" 
+         data-search="{{ candidate.name|lower }} {{ candidate.email|lower }} {{ candidate.latest_status|lower }}"
+         data-name="{{ candidate.name|lower }}"
+         data-email="{{ candidate.email|lower }}"
+         data-interviews="{{ candidate.total_interviews }}"
+         data-status="{{ candidate.latest_status }}"
+         data-score="{{ candidate.best_score|default:'0' }}">
+        <div>
+            <div class="candidate-avatar">{{ candidate.name.0|upper }}</div>
+        </div>
+        <div class="candidate-info">
+            <div class="candidate-name">{{ candidate.name }}</div>
+            {% if candidate.phone %}
+            <div class="candidate-phone">📞 {{ candidate.phone }}</div>
+            {% endif %}
+        </div>
+        <div class="candidate-email">{{ candidate.email }}</div>
+        <div>
+            <div class="interview-count">{{ candidate.total_interviews }} total</div>
+            <div class="interview-count-detail">{{ candidate.completed_interviews }} completed</div>
+        </div>
+        <div>
+            {% if candidate.latest_status == 'completed' %}
+            <span class="status-badge status-completed">✅ Completed</span>
+            {% elif candidate.latest_status == 'in_progress' %}
+            <span class="status-badge status-in-progress">🔄 In Progress</span>
+            {% elif candidate.latest_status == 'abandoned' %}
+            <span class="status-badge status-abandoned">⚠️ Abandoned</span>
+            {% else %}
+            <span class="status-badge status-abandoned">⏳ Pending</span>
+            {% endif %}
+        </div>
+        <div>
+            {% if candidate.best_score %}
+            <span class="score-display">{{ candidate.best_score }}/100</span>
+            {% else %}
+            <span style="color: #9ca3af;">-</span>
+            {% endif %}
+        </div>
+        <div>
+            <a href="{% url 'candidates:profile' candidate.email %}" class="view-btn">
+                View Interviews ({{ candidate.total_interviews }})
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="candidates-table">
+    <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <h2 class="empty-title">No Candidates Yet</h2>
+        <p class="empty-text">Candidates will appear here once they complete interview registrations</p>
+    </div>
+</div>
+{% endif %}
+
+<script>
+let currentSort = {
+    column: null,
+    direction: 'asc'
+};
+
+function filterCandidates() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toLowerCase();
+    const rows = document.querySelectorAll('.table-row');
+    
+    rows.forEach(row => {
+        const searchText = row.getAttribute('data-search');
+        if (searchText.includes(filter)) {
+            row.style.display = 'grid';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function sortTable(column) {
+    const table = document.querySelector('.candidates-table');
+    const rows = Array.from(document.querySelectorAll('.table-row'));
+    
+    // Determine sort direction
+    if (currentSort.column === column) {
+        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSort.column = column;
+        currentSort.direction = 'asc';
+    }
+    
+    // Update sort icons
+    document.querySelectorAll('.sort-icon').forEach(icon => {
+        icon.classList.remove('active');
+        icon.textContent = '↕';
+    });
+    
+    const activeIcon = document.getElementById(`sort-icon-${column}`);
+    activeIcon.classList.add('active');
+    activeIcon.textContent = currentSort.direction === 'asc' ? '↑' : '↓';
+    
+    // Sort rows
+    rows.sort((a, b) => {
+        let aValue = a.getAttribute(`data-${column}`);
+        let bValue = b.getAttribute(`data-${column}`);
+        
+        // Handle numeric values
+        if (column === 'interviews' || column === 'score') {
+            aValue = parseInt(aValue) || 0;
+            bValue = parseInt(bValue) || 0;
+        } else {
+            aValue = aValue.toLowerCase();
+            bValue = bValue.toLowerCase();
+        }
+        
+        // Compare values
+        let comparison = 0;
+        if (aValue > bValue) {
+            comparison = 1;
+        } else if (aValue < bValue) {
+            comparison = -1;
+        }
+        
+        return currentSort.direction === 'asc' ? comparison : -comparison;
+    });
+    
+    // Re-append rows in sorted order
+    const tableHeader = table.querySelector('.table-header');
+    rows.forEach(row => {
+        table.appendChild(row);
+    });
+}
+
+// Initialize with name sorting
+document.addEventListener('DOMContentLoaded', function() {
+    sortTable('name');
+});
+</script>
+{% endblock %}

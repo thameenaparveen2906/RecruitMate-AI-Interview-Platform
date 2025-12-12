@@ -1,0 +1,135 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{{ candidate.name }} - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .candidate-header {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        border-radius: 12px;
+        padding: 40px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+    
+    .candidate-avatar-large {
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        font-weight: bold;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .candidate-info h1 {
+        font-size: 32px;
+        margin-bottom: 8px;
+    }
+    
+    .candidate-info p {
+        font-size: 16px;
+        opacity: 0.9;
+    }
+    
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 8px;
+        padding: 25px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    
+    .info-card h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #111827;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="candidate-header">
+    <div class="candidate-avatar-large">{{ candidate.name.0|upper }}</div>
+    <div class="candidate-info">
+        <h1>{{ candidate.name }}</h1>
+        <p>📧 {{ candidate.email }}</p>
+        {% if candidate.phone %}
+        <p>📞 {{ candidate.phone }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="detail-grid">
+    <div>
+        <div class="info-card">
+            <h2>Professional Information</h2>
+            <div class="info-row">
+                <span style="color: #6b7280;">Added</span>
+                <span style="font-weight: 500;">{{ candidate.created_at|date:"M d, Y" }}</span>
+            </div>
+            {% if candidate.resume_file %}
+            <div class="info-row">
+                <span style="color: #6b7280;">Resume</span>
+                <a href="{{ candidate.resume_file.url }}" target="_blank" class="btn btn-primary btn-sm">View Resume</a>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if candidate.skills %}
+        <div class="info-card">
+            <h2>Skills</h2>
+            <div class="skills-grid">
+                {% for skill in candidate.skills %}
+                <span class="skill-badge btn btn-secondary">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+    </div>
+    
+    <div>
+        <div class="info-card">
+            <h2>Actions</h2>
+            <a href="{% url 'interviews:create' %}?candidate={{ candidate.pk }}" 
+               class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
+                Create Interview
+            </a>
+            <a href="{% url 'candidates:edit' candidate.pk %}" 
+               class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;">
+                Edit Profile
+            </a>
+            <a href="{% url 'candidates:delete' candidate.pk %}" 
+               class="btn btn-danger" style="width: 100%;">
+                Delete Candidate
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

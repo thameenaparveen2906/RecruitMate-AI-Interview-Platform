@@ -1,0 +1,271 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Create Interview - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .form-card {
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        max-width: 800px;
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #dbeafe, #eff6ff);
+        border: 1px solid #93c5fd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .info-box h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e40af;
+        margin-bottom: 10px;
+    }
+    
+    .info-box ul {
+        margin-left: 20px;
+        color: #1e40af;
+    }
+    
+    .info-box li {
+        margin-bottom: 5px;
+    }
+    
+    .select-preview {
+        margin-top: 10px;
+        padding: 15px;
+        background: #f9fafb;
+        border-radius: 6px;
+        display: none;
+    }
+    
+    .select-preview.show {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="page-header">
+    <h1 class="page-title">Create Interview Session</h1>
+</div>
+
+<div class="form-card">
+    <div class="info-box">
+        <h3>AI-Powered Interview</h3>
+        <ul>
+            <li>AI will generate tailored questions based on job description and candidate resume</li>
+            <li>Questions will be evaluated automatically with detailed feedback</li>
+            <li>You'll get a comprehensive report after completion</li>
+        </ul>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="job_id">Select Job Position *</label>
+            <select id="job_id" name="job_id" class="form-control" required onchange="showJobPreview(this)">
+                <option value="">-- Select a job --</option>
+                {% for job in jobs %}
+                <option value="{{ job.pk }}" data-title="{{ job.title }}" data-location="{{ job.location }}">
+                    {{ job.title }} - {{ job.location|default:"Remote" }}
+                </option>
+                {% endfor %}
+            </select>
+            <div id="job-preview" class="select-preview"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="candidate_id">Select Candidate (Optional)</label>
+            <select id="candidate_id" name="candidate_id" class="form-control" onchange="showCandidatePreview(this)">
+                <option value="">-- Leave blank for public interview link --</option>
+                {% for candidate in candidates %}
+                <option value="{{ candidate.pk }}" data-name="{{ candidate.name }}" data-email="{{ candidate.email }}">
+                    {{ candidate.name }} ({{ candidate.email }})
+                </option>
+                {% endfor %}
+            </select>
+            <div id="candidate-preview" class="select-preview"></div>
+            <div style="font-size: 13px; color: #6b7280; margin-top: 8px;">
+                💡 Leave blank to create a shareable link that anyone can use
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="num_questions">Number of Questions</label>
+            <select id="num_questions" name="num_questions" class="form-control">
+                <option value="5">5 questions (Quick - ~15 mins)</option>
+                <option value="10" selected>10 questions (Standard - ~30 mins)</option>
+                <option value="15">15 questions (Comprehensive - ~45 mins)</option>
+                <option value="20">20 questions (Detailed - ~60 mins)</option>
+            </select>
+            <div style="font-size: 13px; color: #6b7280; margin-top: 8px;">
+                💡 More questions provide better evaluation but take longer to complete
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="difficulty_level">Question Difficulty Level</label>
+            <select id="difficulty_level" name="difficulty_level" class="form-control">
+                <option value="mixed" selected>Mixed (Easy, Medium, Hard)</option>
+                <option value="easy">Easy - Entry Level</option>
+                <option value="medium">Medium - Intermediate</option>
+                <option value="hard">Hard - Advanced</option>
+            </select>
+            <div style="font-size: 13px; color: #6b7280; margin-top: 8px;">
+                💡 Mixed difficulty provides balanced evaluation
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="add_custom_questions" name="add_custom_questions" onchange="toggleCustomQuestions()">
+                Add Mandatory Custom Questions
+            </label>
+            <div style="font-size: 13px; color: #6b7280; margin-top: 8px;">
+                💡 Add specific questions that all candidates must answer
+            </div>
+        </div>
+        
+        <div id="custom_questions_section" style="display: none; margin-top: 20px; padding: 20px; background: #f9fafb; border-radius: 8px; border: 2px dashed #d1d5db;">
+            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #374151;">Custom Mandatory Questions</h4>
+            
+            <div id="custom_questions_container">
+                <!-- Custom questions will be added here -->
+            </div>
+            
+            <button type="button" class="btn btn-secondary btn-sm" onclick="addCustomQuestion()" style="margin-top: 10px;  background-color: white;">
+                + Add Question
+            </button>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Generate Interview</button>
+            <a href="{% url 'interviews:list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+let customQuestionCount = 0;
+
+function showJobPreview(select) {
+    const preview = document.getElementById('job-preview');
+    const option = select.options[select.selectedIndex];
+    
+    if (option.value) {
+        preview.innerHTML = `
+            <strong>Selected:</strong> ${option.dataset.title}<br>
+            <strong>Location:</strong> ${option.dataset.location || 'Remote'}
+        `;
+        preview.classList.add('show');
+    } else {
+        preview.classList.remove('show');
+    }
+}
+
+function showCandidatePreview(select) {
+    const preview = document.getElementById('candidate-preview');
+    const option = select.options[select.selectedIndex];
+    
+    if (option.value) {
+        preview.innerHTML = `
+            <strong>Selected:</strong> ${option.dataset.name}<br>
+            <strong>Email:</strong> ${option.dataset.email}
+        `;
+        preview.classList.add('show');
+    } else {
+        preview.classList.remove('show');
+    }
+}
+
+function toggleCustomQuestions() {
+    const checkbox = document.getElementById('add_custom_questions');
+    const section = document.getElementById('custom_questions_section');
+    
+    if (checkbox.checked) {
+        section.style.display = 'block';
+        if (customQuestionCount === 0) {
+            addCustomQuestion();
+        }
+    } else {
+        section.style.display = 'none';
+    }
+}
+
+function addCustomQuestion() {
+    customQuestionCount++;
+    const container = document.getElementById('custom_questions_container');
+    
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'custom-question-item';
+    questionDiv.id = `custom_question_${customQuestionCount}`;
+    questionDiv.style.cssText = 'margin-bottom: 20px; padding: 15px; background: white; border-radius: 6px; border: 1px solid #e5e7eb;';
+    
+    questionDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <strong style="color: #374151;">Question ${customQuestionCount}</strong>
+            <button type="button" class="btn btn-danger btn-sm" onclick="removeCustomQuestion(${customQuestionCount})" style="padding: 4px 12px; font-size: 12px;">
+                Remove
+            </button>
+        </div>
+        
+        <div style="margin-bottom: 10px;">
+            <label style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 5px;">
+                Question Text *
+            </label>
+            <textarea 
+                name="custom_question_text_${customQuestionCount}" 
+                class="form-control" 
+                rows="3" 
+                placeholder="Enter your question here..."
+                required
+                style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;"
+            ></textarea>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 5px;">
+                    Question Type
+                </label>
+                <select name="custom_question_type_${customQuestionCount}" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;">
+                    <option value="technical">Technical</option>
+                    <option value="behavioral">Behavioral</option>
+                    <option value="situational">Situational</option>
+                </select>
+            </div>
+            
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 5px;">
+                    Difficulty
+                </label>
+                <select name="custom_question_difficulty_${customQuestionCount}" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;">
+                    <option value="easy">Easy</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
+        </div>
+        
+        <input type="hidden" name="custom_question_id" value="${customQuestionCount}">
+    `;
+    
+    container.appendChild(questionDiv);
+}
+
+function removeCustomQuestion(id) {
+    const questionDiv = document.getElementById(`custom_question_${id}`);
+    if (questionDiv) {
+        questionDiv.remove();
+    }
+}
+</script>
+{% endblock %}

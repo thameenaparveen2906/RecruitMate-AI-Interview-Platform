@@ -1,0 +1,67 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Edit Job - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .form-card {
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        max-width: 800px;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="page-header">
+    <h1 class="page-title">Edit Job Description</h1>
+</div>
+
+<div class="form-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="title">Job Title *</label>
+            <input type="text" id="title" name="title" class="form-control" 
+                   value="{{ job.title }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Job Description *</label>
+            <textarea id="description" name="description" class="form-control" 
+                      required>{{ job.description }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="requirements">Requirements *</label>
+            <textarea id="requirements" name="requirements" class="form-control" 
+                      required>{{ job.requirements }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="location">Location</label>
+            <input type="text" id="location" name="location" class="form-control" 
+                   value="{{ job.location }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="employment_type">Employment Type</label>
+            <select id="employment_type" name="employment_type" class="form-control">
+                <option value="full-time" {% if job.employment_type == 'full-time' %}selected{% endif %}>Full-time</option>
+                <option value="part-time" {% if job.employment_type == 'part-time' %}selected{% endif %}>Part-time</option>
+                <option value="contract" {% if job.employment_type == 'contract' %}selected{% endif %}>Contract</option>
+                <option value="internship" {% if job.employment_type == 'internship' %}selected{% endif %}>Internship</option>
+            </select>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Update Job</button>
+            <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

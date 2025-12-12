@@ -1,0 +1,260 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Interview Details - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 8px;
+        padding: 25px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 500;
+        color: #6b7280;
+    }
+    
+    .info-value {
+        color: #111827;
+        font-weight: 500;
+    }
+    
+    .link-box {
+        background: linear-gradient(135deg, #dbeafe, #eff6ff);
+        border: 2px solid #93c5fd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
+    .link-box h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e40af;
+        margin-bottom: 15px;
+    }
+    
+    .link-input {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .link-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #93c5fd;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+    }
+    
+    .questions-list {
+        margin-top: 20px;
+    }
+    
+    .question-item {
+        background: #f9fafb;
+        border-left: 4px solid #3b82f6;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+    }
+    
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .question-number {
+        font-weight: 600;
+        color: #3b82f6;
+    }
+    
+    .question-text {
+        color: #111827;
+        line-height: 1.6;
+    }
+    
+    @media (max-width: 768px) {
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="page-header">
+    <h1 class="page-title">Interview Session Details</h1>
+</div>
+
+<div class="detail-grid">
+    <div>
+        <div class="info-card">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">Session Information</h2>
+            
+            <div class="info-row">
+                <span class="info-label">Candidate</span>
+                <span class="info-value">{{ session.candidate.name }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ session.candidate.email }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Job Position</span>
+                <span class="info-value">{{ session.job.title }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Status</span>
+                <span class="info-value">
+                    {% if session.status == 'completed' %}
+                    <span style="color: #10b981;">✅ Completed</span>
+                    {% elif session.status == 'in_progress' %}
+                    <span style="color: #3b82f6;">🔄 In Progress</span>
+                    {% elif session.status == 'pending' %}
+                    <span style="color: #f59e0b;">⏳ Pending</span>
+                    {% else %}
+                    <span style="color: #6b7280;">⚠️ Abandoned</span>
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Created</span>
+                <span class="info-value">{{ session.created_at|date:"M d, Y H:i" }}</span>
+            </div>
+            
+            {% if session.started_at %}
+            <div class="info-row">
+                <span class="info-label">Started</span>
+                <span class="info-value">{{ session.started_at|date:"M d, Y H:i" }}</span>
+            </div>
+            {% endif %}
+            
+            {% if session.completed_at %}
+            <div class="info-row">
+                <span class="info-label">Completed</span>
+                <span class="info-value">{{ session.completed_at|date:"M d, Y H:i" }}</span>
+            </div>
+            {% endif %}
+            
+            <div class="info-row">
+                <span class="info-label">Expires</span>
+                <span class="info-value">{{ session.expires_at|date:"M d, Y" }}</span>
+            </div>
+        </div>
+        
+        <div class="info-card" style="margin-top: 20px;">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">
+                Interview Questions ({{ questions.count }})
+            </h2>
+            
+            <div class="questions-list">
+                {% for question in questions %}
+                <div class="question-item" style="{% if question.is_mandatory %}border-left-color: #ef4444;{% endif %}">
+                    <div class="question-header">
+                        <span class="question-number">
+                            Question {{ question.order }}
+                            {% if question.is_mandatory %}
+                            <span style="color: #ef4444; font-size: 12px; margin-left: 5px;">⭐ MANDATORY</span>
+                            {% endif %}
+                        </span>
+                        <div>
+        
+                            <span class="type-badge difficulty-{{ question.difficulty }}">
+                                {{ question.difficulty|title }}
+                            </span>
+                            {% if question.is_custom %}
+                            <span class="type-badge" style="background: #8b5cf6; color: white;">
+                                Custom
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="question-text">{{ question.question_text }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div>
+        <div class="info-card">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">Quick Actions</h2>
+            
+            {% if session.status == 'completed' %}
+            <a href="{% url 'interviews:results' session.pk %}" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
+                View Results
+            </a>
+            {% endif %}
+            
+            <a href="{% url 'interviews:list' %}" class="btn btn-secondary" style="width: 100%;">
+                ← Back to Interviews
+            </a>
+        </div>
+        
+        <div class="link-box">
+            <h3>Interview Link</h3>
+            <p style="font-size: 14px; color: #1e40af; margin-bottom: 15px;">
+                Share this link with the candidate to start the interview
+            </p>
+            <div class="link-input">
+                <input type="text" id="interview-link" 
+                       value="{{ request.scheme }}://{{ request.get_host }}{% url 'interviews:take' session.token %}" 
+                       readonly>
+                <button onclick="copyInterviewLink()" class="btn btn-primary">Copy</button>
+            </div>
+        </div>
+        
+        <div class="info-card" style="margin-top: 20px;">
+            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">Progress</h3>
+            <div style="margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="font-size: 14px; color: #6b7280;">Answered</span>
+                    <span style="font-size: 14px; font-weight: 600;">{{ answers.count }}/{{ questions.count }}</span>
+                </div>
+                <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                    {% if questions.count > 0 %}
+                    <div style="background: linear-gradient(90deg, #3b82f6, #8b5cf6); height: 100%; width: {% widthratio answers.count questions.count 100 %}%;"></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyInterviewLink() {
+    const input = document.getElementById('interview-link');
+    input.select();
+    document.execCommand('copy');
+    alert('Interview link copied to clipboard!');
+}
+</script>
+{% endblock %}

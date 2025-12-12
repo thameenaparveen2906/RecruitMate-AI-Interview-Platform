@@ -1,0 +1,68 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Delete Candidate - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .delete-card {
+        background: white;
+        border-radius: 8px;
+        padding: 40px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        max-width: 600px;
+        text-align: center;
+    }
+    
+    .warning-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+    
+    .delete-card h2 {
+        font-size: 24px;
+        font-weight: bold;
+        color: #991b1b;
+        margin-bottom: 15px;
+    }
+    
+    .delete-card p {
+        color: #6b7280;
+        margin-bottom: 25px;
+        line-height: 1.6;
+    }
+    
+    .candidate-info {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        text-align: left;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="page-header">
+    <h1 class="page-title">Delete Candidate</h1>
+</div>
+
+<div class="delete-card">
+    <div class="warning-icon">⚠️</div>
+    <h2>Are you sure?</h2>
+    <p>This action cannot be undone. This will permanently delete the candidate profile and all associated interview data.</p>
+    
+    <div class="candidate-info">
+        <strong>Name:</strong> {{ candidate.name }}<br>
+        <strong>Email:</strong> {{ candidate.email }}<br>
+        <strong>Added:</strong> {{ candidate.created_at|date:"M d, Y" }}
+    </div>
+    
+    <form method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete Candidate</button>
+        <a href="{% url 'candidates:detail' candidate.pk %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

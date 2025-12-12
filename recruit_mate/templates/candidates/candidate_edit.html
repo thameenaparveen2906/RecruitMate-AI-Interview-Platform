@@ -1,0 +1,76 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Edit Candidate - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .form-card {
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        max-width: 800px;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="page-header">
+    <h1 class="page-title">Edit Candidate</h1>
+</div>
+
+<div class="form-card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" name="name" class="form-control" 
+                   value="{{ candidate.name }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input type="email" id="email" name="email" class="form-control" 
+                   value="{{ candidate.email }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" class="form-control" 
+                   value="{{ candidate.phone }}">
+        </div>
+        
+        {% if candidate.resume_file %}
+        <div class="form-group">
+            <label>Current Resume (Uploaded File)</label>
+            <div style="background: #f9fafb; padding: 15px; border-radius: 6px; margin-bottom: 10px;">
+                <a href="{{ candidate.resume_file.url }}" target="_blank" style="color: #3b82f6; text-decoration: none;">
+                    📄 View Current Resume
+                </a>
+            </div>
+        </div>
+        {% elif candidate.resume_url %}
+        <div class="form-group">
+            <label>Current Resume (URL)</label>
+            <div style="background: #f9fafb; padding: 15px; border-radius: 6px; margin-bottom: 10px;">
+                <a href="{{ candidate.resume_url }}" target="_blank" style="color: #3b82f6; text-decoration: none;">
+                    📄 View Current Resume
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="resume">Upload New Resume (Optional)</label>
+            <input type="file" id="resume" name="resume" class="form-control" accept=".pdf,.doc,.docx">
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Update Candidate</button>
+            <a href="{% url 'candidates:detail' candidate.pk %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

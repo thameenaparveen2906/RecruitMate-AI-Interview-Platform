@@ -1,0 +1,429 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Interview Candidates - {{ session.job.title }}{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #3b82f6;
+        text-decoration: none;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+    
+    .back-link:hover {
+        color: #2563eb;
+    }
+    
+    .interview-header {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .interview-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .interview-title h1 {
+        font-size: 28px;
+        font-weight: bold;
+        color: #111827;
+        margin: 0;
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+        margin-top: 20px;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-label {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 5px;
+    }
+    
+    .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    
+    .stat-value.green {
+        color: #10b981;
+    }
+    
+    .stat-value.blue {
+        color: #3b82f6;
+    }
+    
+    .stat-value.red {
+        color: #ef4444;
+    }
+    
+    .candidates-section {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    
+    .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+    }
+    
+    .download-btn {
+        background: #10b981;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .download-btn:hover {
+        background: #059669;
+    }
+    
+    .candidates-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .candidates-table thead {
+        background: #f9fafb;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .candidates-table th {
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        user-select: none;
+        transition: color 0.2s;
+    }
+    
+    .candidates-table th:hover {
+        color: #3b82f6;
+    }
+    
+    .candidates-table th .sort-icon {
+        font-size: 10px;
+        opacity: 0.5;
+        margin-left: 5px;
+    }
+    
+    .candidates-table th .sort-icon.active {
+        opacity: 1;
+        color: #3b82f6;
+    }
+    
+    .candidates-table td {
+        padding: 16px;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+    }
+    
+    .candidates-table tbody tr:hover {
+        background: #f9fafb;
+    }
+    
+    .candidate-name {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .candidate-avatar {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    .status-pill {
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-in-progress {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-abandoned {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .view-btn {
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 13px;
+    }
+    
+    .view-btn:hover {
+        color: #2563eb;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<a href="{% url 'interviews:links' %}" class="back-link">
+    ← Back to Interview Links
+</a>
+
+<div class="interview-header">
+    <div class="interview-title">
+        <h1>{{ session.job.title }}</h1>
+    </div>
+    <p style="color: #6b7280; margin: 0;">{{ session.job.description|truncatewords:30 }}</p>
+    
+    <div class="stats-row">
+        <div class="stat-item">
+            <div class="stat-label">Total Candidates</div>
+            <div class="stat-value">{{ total_candidates }}</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">Completed</div>
+            <div class="stat-value green">{{ completed_count }}</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">In Progress</div>
+            <div class="stat-value blue">{{ in_progress_count }}</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">Abandoned</div>
+            <div class="stat-value red">{{ abandoned_count }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="candidates-section">
+    <div class="section-header">
+        <h2 class="section-title">Candidates</h2>
+        <p style="color: #6b7280; font-size: 14px; margin: 0;">View all candidates who have taken this interview</p>
+        <a href="#" class="download-btn">
+            Download CSV
+        </a>
+    </div>
+    
+    {% if candidates %}
+    <table class="candidates-table">
+        <thead>
+            <tr>
+                <th onclick="sortInterviewTable('name')">
+                    NAME
+                    <span class="sort-icon" id="sort-icon-name">↕</span>
+                </th>
+                <th onclick="sortInterviewTable('email')">
+                    EMAIL
+                    <span class="sort-icon" id="sort-icon-email">↕</span>
+                </th>
+                <th onclick="sortInterviewTable('phone')">
+                    PHONE
+                    <span class="sort-icon" id="sort-icon-phone">↕</span>
+                </th>
+                <th onclick="sortInterviewTable('status')">
+                    STATUS
+                    <span class="sort-icon" id="sort-icon-status">↕</span>
+                </th>
+                <th onclick="sortInterviewTable('score')">
+                    SCORE
+                    <span class="sort-icon" id="sort-icon-score">↕</span>
+                </th>
+                <th onclick="sortInterviewTable('started')">
+                    STARTED AT
+                    <span class="sort-icon" id="sort-icon-started">↕</span>
+                </th>
+                <th>RESUME</th>
+                <th>ACTIONS</th>
+            </tr>
+        </thead>
+        <tbody id="candidatesTableBody">
+            {% for candidate_session in candidates %}
+            <tr data-name="{{ candidate_session.candidate_name|lower|default:'anonymous' }}"
+                data-email="{{ candidate_session.candidate_email|lower|default:'-' }}"
+                data-phone="{{ candidate_session.candidate_phone|default:'-' }}"
+                data-status="{{ candidate_session.status }}"
+                data-score="{{ candidate_session.result.overall_score|default:'0' }}"
+                data-started="{{ candidate_session.started_at|date:'U'|default:'0' }}">
+                <td>
+                    <div class="candidate-name">
+                        <div class="candidate-avatar">
+                            {{ candidate_session.candidate_name.0|upper|default:"?" }}
+                        </div>
+                        <span>{{ candidate_session.candidate_name|default:"Anonymous" }}</span>
+                    </div>
+                </td>
+                <td>{{ candidate_session.candidate_email|default:"-" }}</td>
+                <td>{{ candidate_session.candidate_phone|default:"-" }}</td>
+                <td>
+                    {% if candidate_session.status == 'completed' %}
+                    <span class="status-pill status-completed">✅ completed</span>
+                    {% elif candidate_session.status == 'in_progress' %}
+                    <span class="status-pill status-in-progress">🔄 in progress</span>
+                    {% else %}
+                    <span class="status-pill status-abandoned">⚠️ abandoned</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if candidate_session.result %}
+                    <strong>{{ candidate_session.result.overall_score }}/100</strong>
+                    {% else %}
+                    <span style="color: #9ca3af;">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if candidate_session.started_at %}
+                    {{ candidate_session.started_at|date:"d/m/Y" }}<br>
+                    <span style="font-size: 12px; color: #9ca3af;">{{ candidate_session.started_at|time:"H:i" }}</span>
+                    {% else %}
+                    <span style="color: #9ca3af;">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if candidate_session.candidate_resume_file %}
+                    <a href="{{ candidate_session.candidate_resume_file.url }}" target="_blank" class="view-btn">
+                        📄 View
+                    </a>
+                    {% elif candidate_session.candidate_resume_url %}
+                    <a href="{{ candidate_session.candidate_resume_url }}" target="_blank" class="view-btn">
+                        📄 View
+                    </a>
+                    {% else %}
+                    <span style="color: #9ca3af;">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if candidate_session.status == 'completed' %}
+                    <a href="{% url 'interviews:results' candidate_session.pk %}" class="view-btn">
+                        View
+                    </a>
+                    {% else %}
+                    <span style="color: #9ca3af;">-</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 60px 20px; color: #6b7280;">
+        <p style="font-size: 16px; margin-bottom: 10px;">No candidates have taken this interview yet</p>
+        <p style="font-size: 14px;">Share the interview link to start receiving responses</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+let currentInterviewSort = {
+    column: null,
+    direction: 'asc'
+};
+
+function sortInterviewTable(column) {
+    const tbody = document.getElementById('candidatesTableBody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Determine sort direction
+    if (currentInterviewSort.column === column) {
+        currentInterviewSort.direction = currentInterviewSort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentInterviewSort.column = column;
+        currentInterviewSort.direction = 'asc';
+    }
+    
+    // Update sort icons
+    document.querySelectorAll('.sort-icon').forEach(icon => {
+        icon.classList.remove('active');
+        icon.textContent = '↕';
+    });
+    
+    const activeIcon = document.getElementById(`sort-icon-${column}`);
+    activeIcon.classList.add('active');
+    activeIcon.textContent = currentInterviewSort.direction === 'asc' ? '↑' : '↓';
+    
+    // Sort rows
+    rows.sort((a, b) => {
+        let aValue = a.getAttribute(`data-${column}`);
+        let bValue = b.getAttribute(`data-${column}`);
+        
+        // Handle numeric values
+        if (column === 'score' || column === 'started') {
+            aValue = parseInt(aValue) || 0;
+            bValue = parseInt(bValue) || 0;
+        } else {
+            aValue = aValue.toLowerCase();
+            bValue = bValue.toLowerCase();
+        }
+        
+        // Compare values
+        let comparison = 0;
+        if (aValue > bValue) {
+            comparison = 1;
+        } else if (aValue < bValue) {
+            comparison = -1;
+        }
+        
+        return currentInterviewSort.direction === 'asc' ? comparison : -comparison;
+    });
+    
+    // Re-append rows in sorted order
+    rows.forEach(row => {
+        tbody.appendChild(row);
+    });
+}
+
+// Initialize with name sorting
+document.addEventListener('DOMContentLoaded', function() {
+    sortInterviewTable('name');
+});
+</script>
+{% endblock %}

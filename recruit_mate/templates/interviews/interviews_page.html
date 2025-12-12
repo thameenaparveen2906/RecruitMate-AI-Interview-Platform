@@ -1,0 +1,281 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Interviews - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .page-header {
+        margin-bottom: 30px;
+    }
+    
+    .page-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+    
+    .page-subtitle {
+        color: #6b7280;
+        font-size: 14px;
+    }
+    
+    .filter-tabs {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 30px;
+    }
+    
+    .filter-tab {
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        background: #f3f4f6;
+        color: #6b7280;
+        transition: all 0.2s;
+    }
+    
+    .filter-tab.active {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .filter-tab:hover:not(.active) {
+        background: #e5e7eb;
+    }
+    
+    .search-bar {
+        max-width: 500px;
+        margin-bottom: 30px;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 12px 20px 12px 45px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 14px;
+        background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 15px center;
+    }
+    
+    .interview-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .interview-card:hover {
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .candidate-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+    
+    .interview-info {
+        flex: 1;
+    }
+    
+    .candidate-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+    
+    .job-title {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+    
+    .interview-meta {
+        display: flex;
+        gap: 20px;
+        font-size: 13px;
+        color: #6b7280;
+    }
+    
+    .interview-status {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .status-badge {
+        padding: 6px 16px;
+        border-radius: 16px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-in-progress {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-abandoned {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .view-report-btn {
+        background: #3b82f6;
+        color: white;
+        padding: 10px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+    
+    .view-report-btn:hover {
+        background: #2563eb;
+    }
+    
+    .score-display {
+        font-size: 14px;
+        color: #6b7280;
+    }
+    
+    .score-value {
+        font-weight: 600;
+        color: #111827;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: #6b7280;
+    }
+    
+    .empty-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        font-size: 20px;
+        color: #111827;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="page-header">
+    <h1 class="page-title">Interviews</h1>
+    <p class="page-subtitle">{{ total_count }} of {{ total_count }} interview sessions</p>
+</div>
+
+<div class="search-bar">
+    <input type="text" class="search-input" placeholder="Search by candidate name or job title..." id="searchInput">
+</div>
+
+<div class="filter-tabs">
+    <button class="filter-tab {% if not filter or filter == 'all' %}active{% endif %}" onclick="filterInterviews('all')">
+        All
+    </button>
+    <button class="filter-tab {% if filter == 'completed' %}active{% endif %}" onclick="filterInterviews('completed')">
+        Completed
+    </button>
+    <button class="filter-tab {% if filter == 'in_progress' %}active{% endif %}" onclick="filterInterviews('in_progress')">
+        In Progress
+    </button>
+</div>
+
+{% if sessions %}
+    {% for session in sessions %}
+    <div class="interview-card" data-status="{{ session.status }}" data-search="{{ session.candidate_name|lower }} {{ session.job.title|lower }}">
+        <div class="candidate-avatar" style="background: linear-gradient(135deg, {% cycle '#3b82f6' '#8b5cf6' '#ec4899' '#f59e0b' '#10b981' %}, {% cycle '#8b5cf6' '#ec4899' '#f59e0b' '#10b981' '#3b82f6' %});">
+            {{ session.candidate_name.0|upper|default:"?" }}
+        </div>
+        
+        <div class="interview-info">
+            <div class="candidate-name">{{ session.candidate_name|default:"Anonymous Candidate" }}</div>
+            <div class="job-title">{{ session.job.title }}</div>
+            <div class="interview-meta">
+                <span>📆 {{ session.started_at|date:"M d, Y" }}</span>
+                {% if session.status == 'completed' and session.result %}
+                <span class="score-display">Score: <span class="score-value">{{ session.result.overall_score }}/100</span></span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="interview-status">
+            {% if session.status == 'completed' %}
+            <span class="status-badge status-completed">✅ Completed</span>
+            {% elif session.status == 'in_progress' %}
+            <span class="status-badge status-in-progress">🔄 In Progress</span>
+            {% else %}
+            <span class="status-badge status-abandoned">⚠️ Abandoned</span>
+            {% endif %}
+            
+            {% if session.status == 'completed' %}
+            <a href="{% url 'interviews:results' session.pk %}" class="view-report-btn">
+                View Report
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>No Interview Sessions Yet</h3>
+        <p>Interview sessions will appear here once candidates start taking interviews</p>
+    </div>
+{% endif %}
+
+<script>
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    document.querySelectorAll('.interview-card').forEach(card => {
+        const searchData = card.dataset.search;
+        if (searchData.includes(searchTerm)) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+});
+
+// Filter functionality
+function filterInterviews(status) {
+    const url = new URL(window.location);
+    if (status === 'all') {
+        url.searchParams.delete('filter');
+    } else {
+        url.searchParams.set('filter', status);
+    }
+    window.location = url;
+}
+</script>
+{% endblock %}

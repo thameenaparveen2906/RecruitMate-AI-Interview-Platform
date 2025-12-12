@@ -1,0 +1,107 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Add Candidate - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .form-card {
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        max-width: 800px;
+    }
+    
+    .file-upload {
+        border: 2px dashed #d1d5db;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .file-upload:hover {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+    
+    .file-upload-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+    
+    .file-upload input[type="file"] {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="page-header">
+    <h1 class="page-title">Add Candidate</h1>
+</div>
+
+<div class="form-card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" name="name" class="form-control" 
+                   placeholder="John Doe" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input type="email" id="email" name="email" class="form-control" 
+                   placeholder="john@example.com" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" class="form-control" 
+                   placeholder="+99-9999999999">
+        </div>
+        
+        <div class="form-group">
+            <label>Resume Upload</label>
+            <label for="resume" class="file-upload">
+                <div class="file-upload-icon">📄</div>
+                <div style="font-weight: 500; color: #111827; margin-bottom: 5px;">
+                    Click to upload resume
+                </div>
+                <div style="font-size: 14px; color: #6b7280;">
+                    PDF, DOC, DOCX (Max 5MB)
+                </div>
+                <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx">
+            </label>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Add Candidate</button>
+            <a href="{% url 'candidates:list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('resume').addEventListener('change', function(e) {
+    const fileName = e.target.files[0]?.name;
+    if (fileName) {
+        const label = document.querySelector('.file-upload');
+        label.innerHTML = `
+            <div class="file-upload-icon">✅</div>
+            <div style="font-weight: 500; color: #10b981; margin-bottom: 5px;">
+                ${fileName}
+            </div>
+            <div style="font-size: 14px; color: #6b7280;">
+                Click to change file
+            </div>
+        `;
+    }
+});
+</script>
+{% endblock %}

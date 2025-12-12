@@ -1,0 +1,140 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Candidates - RecruitMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .candidates-table {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    thead {
+        background: #f9fafb;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    th {
+        padding: 15px 20px;
+        text-align: left;
+        font-size: 14px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    td {
+        padding: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    tbody tr:hover {
+        background: #f9fafb;
+    }
+    
+    .candidate-name {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+    
+    .candidate-email {
+        font-size: 14px;
+        color: #6b7280;
+    }
+    
+    .skills-preview {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .skill-mini {
+        background: #dbeafe;
+        color: #1e40af;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="page-actions">
+    <h1 class="page-title">Candidates</h1>
+    <a href="{% url 'candidates:create' %}" class="btn btn-primary">+ Add Candidate</a>
+</div>
+
+{% if candidates %}
+<div class="candidates-table">
+    <table>
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Phone</th>
+                <th>Experience</th>
+                <th>Skills</th>
+                <th>Added</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for candidate in candidates %}
+            <tr>
+                <td>
+                    <div class="candidate-name">{{ candidate.name }}</div>
+                    <div class="candidate-email">{{ candidate.email }}</div>
+                </td>
+                <td>{{ candidate.phone|default:"-" }}</td>
+                <td>{{ candidate.experience_years|default:"-" }} years</td>
+                <td>
+                    <div class="skills-preview">
+                        {% for skill in candidate.skills|slice:":3" %}
+                        <span class="skill-mini">{{ skill }}</span>
+                        {% endfor %}
+                        {% if candidate.skills|length > 3 %}
+                        <span class="skill-mini">+{{ candidate.skills|length|add:"-3" }}</span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>{{ candidate.created_at|date:"M d, Y" }}</td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'candidates:detail' candidate.pk %}" class="btn btn-primary btn-sm">View</a>
+                        <a href="{% url 'candidates:edit' candidate.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">👥</div>
+    <h3>No Candidates Yet</h3>
+    <p>Add your first candidate to start creating interviews</p>
+    <a href="{% url 'candidates:create' %}" class="btn btn-primary">Add Candidate</a>
+</div>
+{% endif %}
+{% endblock %}
