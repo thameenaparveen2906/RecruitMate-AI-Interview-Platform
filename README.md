@@ -4,7 +4,7 @@ RecruitMate is a **modern AI-powered interview automation system** built with **
 
 ---
 
-## Features
+## 📌 Features
 
 ### 🔹 AI-Powered Interviews
 - Automated question generation using **Google Gemini AI**
