@@ -3,6 +3,7 @@
 {% block title %}RecruitMate - Home{% endblock %}
 
 {% block extra_css %}
+{% load static %}
 <style>
     .home-container {
         font-family: "Poppins", sans-serif;
@@ -215,9 +216,9 @@
         </div>
     </nav>
 
-   
+   <img src="{% static 'logo.png' %}" alt="Logo">
     <section class="hero">
-        <div class="hero-background-shape" style="background-image: url('/static/image.png');"></div>
+        <div class="hero-background-shape" style="background-image: url('{% static 'image.png' %}');"></div>
 
         <div class="hero-text">
             <h1>AI-Powered Hiring, Simplified</h1>
@@ -239,14 +240,14 @@
         <div class="features-cards">
 
             <div class="card glass-card">
-                <img src="/static/link.gif" class="card-gif" alt="Link GIF">
+                <img src="{% static 'link.gif' %}" class="card-gif" alt="Link GIF">
                 <h3>Shareable Interview Links</h3>
                 <p>
                     Send interview links instantly to candidates for different roles.
             </div>
 
             <div class="card glass-card">
-                <img src="/static/ai.gif" class="card-gif" alt="AI GIF">
+                <img src="{% static 'ai.gif' %}" class="card-gif" alt="AI GIF">
                 <h3>AI-Powered Evaluation</h3>
                 <p>
                     Get instant insights and feedback on candidate performance.
@@ -254,7 +255,7 @@
             </div>
 
             <div class="card glass-card">
-                <img src="/static/dashboard.gif" class="card-gif" alt="Dashboard GIF">
+                <img src="{% static 'dashboard.gif' %}" class="card-gif" alt="Dashboard GIF">
                 <h3>Comprehensive Dashboard</h3>
                 <p>
                     Manage all interviews and track results in one place.
