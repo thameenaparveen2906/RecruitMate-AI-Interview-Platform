@@ -1,5 +1,3 @@
-
-# jobs/services/openai_service.py
 from openai import OpenAI
 from django.conf import settings
 import json
