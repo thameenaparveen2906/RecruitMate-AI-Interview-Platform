@@ -17,7 +17,7 @@ def candidate_list_view(request):
 def candidates_all_view(request):
     candidate_sessions = InterviewSession.objects.filter(
         user=request.user,
-        master_token__isnull=False  # Only candidate sessions, not master sessions
+        master_token__isnull=False  
     ).exclude(
         candidate_email=''
     ).select_related('result').order_by('candidate_email', '-created_at')
