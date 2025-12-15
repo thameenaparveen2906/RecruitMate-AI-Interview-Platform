@@ -10,13 +10,12 @@ class GeminiService:
     def __init__(self):
         genai.configure(api_key=settings.GEMINI_API_KEY)
 
-        # FIX: Use valid model (gemini-pro is deprecated)
+        # Use valid model (gemini-pro is deprecated)
         self.model = genai.GenerativeModel("models/gemini-flash-lite-latest")
 
 
 
     def _get_text(self, response):
-        """Correct Gemini parsing"""
         try:
             text = ""
             for p in response.candidates[0].content.parts:
@@ -32,13 +31,11 @@ class GeminiService:
 
         cleaned = text.strip()
 
-        # Try load direct JSON
         try:
             return json.loads(cleaned)
         except:
             pass
 
-        # Capture first JSON block
         match = re.search(r'(\[.*\]|\{.*\})', cleaned, re.DOTALL)
         if match:
             try:
@@ -48,8 +45,6 @@ class GeminiService:
 
         return None
 
-
-    # ⭐ FIX: ADDED REQUIRED METHOD
     def _get_fallback_questions(self, num_questions):
         fallback = []
         for i in range(1, num_questions + 1):
