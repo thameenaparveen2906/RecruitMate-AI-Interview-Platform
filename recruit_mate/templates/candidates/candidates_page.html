@@ -222,6 +222,111 @@
         font-size: 16px;
         color: #6b7280;
     }
+    @media (max-width: 1024px) {
+
+    .candidates-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .candidates-title {
+        font-size: 24px;
+    }
+
+    .table-header,
+    .table-row {
+        grid-template-columns: 40px 2fr 2fr 1fr 1fr 1fr 1fr;
+        padding: 15px;
+    }
+}
+@media (max-width: 768px) {
+
+    .table-header {
+        display: none; /* ❌ hide table header */
+    }
+
+    .table-row {
+        display: block;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        background: #ffffff;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .table-row > div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .table-row > div:last-child {
+        margin-bottom: 0;
+    }
+
+    .candidate-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .candidate-info {
+        flex: 1;
+        margin-left: 10px;
+    }
+
+    .candidate-name {
+        font-size: 15px;
+    }
+
+    .candidate-email,
+    .candidate-phone {
+        font-size: 13px;
+    }
+
+    .score-display {
+        font-size: 16px;
+    }
+
+    .view-btn {
+        width: 100%;
+        text-align: center;
+        margin-top: 8px;
+    }
+}
+@media (max-width: 480px) {
+
+    .candidates-title {
+        font-size: 20px;
+    }
+
+    .candidates-count {
+        font-size: 14px;
+    }
+
+    .search-input {
+        font-size: 13px;
+        padding: 10px 40px;
+    }
+
+    .status-badge {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+
+    .view-btn {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
+
+
 </style>
 {% endblock %}
 
