@@ -19,21 +19,21 @@
         }
         
         .container {
+            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 1rem;
         }
         
         .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            min-height: 44px;
+            font-size: 0.95rem;
         }
+
         
         .btn-primary {
         background: linear-gradient(135deg, #6c5ce7,  #4bb3fd);
@@ -104,7 +104,7 @@
             padding: 10px 12px;
             border: 1px solid #d1d5db;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 16px;
         }
         
         .form-control:focus {
@@ -117,6 +117,28 @@
             min-height: 100px;
             resize: vertical;
         }
+        .flex {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (max-width: 768px) {
+        h1 {
+            font-size: 1.8rem;
+        }
+    
+        h2 {
+            font-size: 1.4rem;
+        }
+        }
+
+
     </style>
     {% block extra_css %}{% endblock %}
 </head>
