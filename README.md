@@ -4,6 +4,11 @@ RecruitMate is a **modern AI-powered interview automation system** built with **
 
 ---
 
+🔗 Live demo (Render free tier – may take a few seconds to load): 
+https://recruitmate-ai-interview-platform.onrender.com
+
+---
+
 ## 📌 Features
 
 ### 🔹 AI-Powered Interviews
