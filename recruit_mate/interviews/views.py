@@ -7,6 +7,9 @@ from .models import InterviewSession, InterviewQuestion, InterviewAnswer, Interv
 from jobs.models import JobDescription
 from candidates.models import Candidate
 from dashboard.services import GeminiService, ResumeParser
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+
 
 @login_required
 def interview_list_view(request):
@@ -478,3 +481,20 @@ def interview_results_view(request, pk):
         'answers': answers
     })
 
+@require_POST
+def disqualify_interview(request):
+    data = json.loads(request.body)
+    session_id = data.get("session_id")
+    reason = data.get("reason", "Policy violation")
+
+    try:
+        session = InterviewSession.objects.get(id=session_id)
+        session.status = "DISQUALIFIED"
+        session.disqualification_reason = reason
+        session.save()
+        return JsonResponse({"success": True})
+    except InterviewSession.DoesNotExist:
+        return JsonResponse({"success": False}, status=404)
+    
+def interview_disqualified(request):
+    return render(request, "interviews/disqualified.html")

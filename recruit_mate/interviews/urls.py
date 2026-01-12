@@ -14,4 +14,6 @@ urlpatterns = [
     path('<int:pk>/delete/', views.interview_delete_view, name='delete'),
     path('<int:pk>/edit/', views.interview_edit_view, name='edit'),
     path('take/<uuid:token>/', views.interview_take_view, name='take'),
+    path("interview/disqualify/", views.disqualify_interview, name="disqualify_interview"),
+    path("interview/disqualified/", views.interview_disqualified, name="interview_disqualified"),
 ]

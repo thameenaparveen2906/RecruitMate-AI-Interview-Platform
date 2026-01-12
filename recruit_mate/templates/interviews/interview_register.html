@@ -176,6 +176,45 @@
         color: #059669;
         font-weight: 500;
     }
+    .interview-rules {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 30px 0;
+    }
+
+    .interview-rules h3 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #111827;
+    }
+
+    .interview-rules ul {
+        padding-left: 20px;
+        margin-bottom: 15px;
+        color: #374151;
+    }
+
+    .interview-rules li {
+        margin-bottom: 8px;
+        font-size: 15px;
+    }
+
+    .rules-checkbox {
+        display: flex;
+        gap: 10px;
+        font-size: 14px;
+        color: #374151;
+        cursor: pointer;
+    }
+
+    .rules-checkbox input {
+        margin-top: 3px;
+    }
+</style>
+
 </style>
 {% endblock %}
 
@@ -264,10 +303,29 @@
                         >
                     </label>
                 </div>
+                <div class="interview-rules">
+                    <h3>📋 Interview Rules</h3>
+                    <ul>
+                        <li>❌ Do not switch browser tabs during the interview</li>
+                        <li>❌ Do not minimize the browser or open other applications</li>
+                        <li>❌ Leaving the interview window will result in immediate disqualification</li>
+                        <li>✅ Ensure a stable internet connection</li>
+                    </ul>
+
+                    <label class="rules-checkbox">
+                        <input type="checkbox" id="agreeRules">
+                        <span>
+                            I understand and agree to follow the interview rules. I am aware that
+                            switching tabs or leaving the interview window will disqualify me.
+                        </span>
+                    </label>
+                </div>
+
                 
-                <button type="submit" class="submit-btn" id="submitBtn">
+                <button type="submit" class="submit-btn" id="submitBtn" disabled>
                     Start Interview →
                 </button>
+
                 
                 <div class="privacy-note">
                     🔒 Your information is secure and will only be shared with the hiring team
@@ -316,5 +374,15 @@ document.querySelector('form').addEventListener('submit', function(e) {
         fileInput.focus();
     }
 });
+const agreeCheckbox = document.getElementById("agreeRules");
+const submitBtn = document.getElementById("submitBtn");
+
+agreeCheckbox.addEventListener("change", function () {
+    submitBtn.disabled = !this.checked;
+});
 </script>
+
+
+
+
 {% endblock %}
