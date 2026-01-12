@@ -176,9 +176,10 @@
     }
     
     .submit-section {
+        margin-top: 32px;
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        flex-direction: column;
+        gap: 18px;            
     }
     
     .submit-btn {
@@ -228,6 +229,15 @@
         font-size: 18px;
         color: #6b7280;
         margin-bottom: 30px;
+    }
+    .disqualification-warning {
+        margin-top: 12px;
+        padding: 10px 14px;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        color: #991b1b;
+        font-size: 14px;
     }
 </style>
 {% endblock %}
@@ -308,12 +318,19 @@
                 
                 <div class="submit-section">
                     <div style="color: #6b7280;">
-                        ⏱️ No time limit - answer at your own pace
+                        ⏱️ No time limit – answer at your own pace
                     </div>
+
+                    <div class="disqualification-warning">
+                        ⚠️ Leaving this interview window, switching tabs, or minimizing the browser
+                        will result in <strong>immediate disqualification</strong>.
+                    </div>
+
                     <button type="submit" class="submit-btn">
                         Submit Answer →
                     </button>
                 </div>
+
             </form>
         </div>
         {% else %}
@@ -328,4 +345,55 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+    let interviewActive = true;
+    let disqualified = false;
+
+    function disqualifyInterview(reason) {
+        if (disqualified) return;
+        disqualified = true;
+
+        // Stop further interaction
+        interviewActive = false;
+
+        fetch("{% url 'interviews:disqualify_interview' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                session_id: "{{ session.id }}",
+                reason: reason
+            })
+        }).finally(() => {
+            alert("Interview disqualified due to tab switching.");
+            window.location.href = "{% url 'interviews:interview_disqualified' %}";
+        });
+    }
+
+    // Detect tab switch / minimize / app switch
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden && interviewActive) {
+            disqualifyInterview("Tab switch detected");
+        }
+    });
+
+    // Extra safety: detect window losing focus
+    window.addEventListener("blur", () => {
+        if (interviewActive) {
+            disqualifyInterview("Window lost focus");
+        }
+    });
+
+    // Disable detection during form submission (avoid false positive)
+    const form = document.querySelector("form");
+    if (form) {
+        form.addEventListener("submit", () => {
+            interviewActive = false;
+        });
+    }
+</script>
+
 {% endblock %}
